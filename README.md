@@ -1,132 +1,122 @@
-<p align="center">
-  <img src="https://content.umami.is/website/images/umami-logo.png" alt="Umami Logo" width="100">
-</p>
+<div align="center">
+  <img src="https://raw.githubusercontent.com/ziur-vela/nova-analytics/master/public/logo.svg" alt="Nova Analytics" width="120" />
+</div>
 
-<h1 align="center">Nova Analytics</h1>
+# Nova Analytics
 
-<p align="center">
-  <i>Umami is a simple, fast, privacy-focused alternative to Google Analytics.</i>
-</p>
+**Privacy-First Data Intelligence**
 
-<p align="center">
-  <a href="https://github.com/umami-software/umami/releases"><img src="https://img.shields.io/github/release/umami-software/umami.svg" alt="GitHub Release" /></a>
-  <a href="https://github.com/umami-software/umami/blob/master/LICENSE"><img src="https://img.shields.io/github/license/umami-software/umami.svg" alt="MIT License" /></a>
-  <a href="https://github.com/umami-software/umami/actions"><img src="https://img.shields.io/github/actions/workflow/status/umami-software/umami/ci.yml" alt="Build Status" /></a>
-  <a href="https://analytics.umami.is/share/LGazGOecbDtaIwDr/umami.is" style="text-decoration: none;"><img src="https://img.shields.io/badge/Try%20Demo%20Now-Click%20Here-brightgreen" alt="Umami Demo" /></a>
-</p>
+Nova Analytics is a source-level rebrand of [umami-software/umami](https://github.com/umami-software/umami) v3.1.0, built as a trial assignment for DCM Ops. It demonstrates forking an open-source project, applying a full rebrand at the source level, building custom auth flows on top of a single-admin backend, and deploying to self-hosted infrastructure via Docker and Cloudflare Tunnel.
+
+🔗 **Live:** [novaanalyrics.com](https://novaanalyrics.com) · **Fallback:** [nova-analytics.opcontrol.net](https://nova-analytics.opcontrol.net)
 
 ---
 
-## 🚀 Getting Started
+## What was changed from upstream
 
-A detailed getting started guide can be found at [umami.is/docs](https://umami.is/docs/).
+- All "Umami" strings replaced across all `public/intl/messages/` translation files
+- Logo and favicon replaced with Nova Analytics SVG mark
+- Brand colors applied (`#F5A623` orange / `#1B2A4A` navy) across `global.css` and component files
+- App name and metadata updated in `package.json`, `next.config.ts`, `layout.tsx`
+- Hardcoded "Umami" text replaced in `SideNav.tsx`, `MobileNav.tsx`, and layout files
+- Logo components (`Logo.tsx`, `LogoWhite.tsx`) updated to Nova Analytics SVG
+- Post-logout redirect changed from `/login` to `/` (landing page)
 
----
+## What was added
 
-## 🛠 Installing from Source
-
-### Requirements
-
-- A server with Node.js version 18.18+.
-- A PostgreSQL database version v12.14+.
-
-### Get the source code and install packages
-
-```bash
-git clone https://github.com/umami-software/umami.git
-cd umami
-pnpm install
-```
-
-### Configure Umami
-
-Create an `.env` file with the following:
-
-```bash
-DATABASE_URL=connection-url
-```
-
-The connection URL format:
-
-```bash
-postgresql://username:mypassword@localhost:5432/mydb
-```
-
-### Build the Application
-
-```bash
-pnpm run build
-```
-
-The build step will create tables in your database if you are installing for the first time. It will also create a login user with username **admin** and password **umami**.
-
-### Start the Application
-
-```bash
-pnpm run start
-```
-
-By default, this will launch the application on `http://localhost:3000`. You will need to either [proxy](https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/) requests from your web server or change the [port](https://nextjs.org/docs/api-reference/cli#production) to serve the application directly.
+- **Landing page** — `src/app/(landing)/page.tsx` — branded marketing page with hero, features grid, stats strip, and CTA
+- **Signup page** — `src/app/(auth)/signup/page.tsx`
+- **Login page** — `src/app/(auth)/login/page.tsx`
+- **`/api/register` route** — `src/app/api/register/route.ts` — server-side proxy that creates users via Umami's admin API without exposing the admin token to the client
 
 ---
 
-## 🐳 Installing with Docker
+## Auth Design
 
-Umami provides Docker images as well as a Docker compose file for easy deployment.
+Umami supports only a single admin account natively. Nova Analytics adds a public signup flow via a server-side proxy pattern:
 
-Docker image:
+1. Signup form POSTs to `/api/register`
+2. Server holds `NOVA_ADMIN_TOKEN` (env var, never exposed to browser)
+3. Proxies user creation to Umami's `POST /api/users` with admin JWT
+4. On success, auto-assigns the Nova Analytics website to the new user via Prisma
+5. User is redirected to `/login`
+
+Login uses Umami's native `POST /api/auth/login`. The returned JWT is stored as `localStorage.setItem('umami.auth', JSON.stringify(token))` to match Umami's internal `getItem` JSON.parse wrapper.
+
+---
+
+## Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 15 (App Router) |
+| Database | PostgreSQL 15 + Prisma ORM |
+| Auth | JWT — Umami native + custom `/api/register` proxy |
+| Deployment | Docker Compose (2 containers: app + postgres) |
+| Tunnel | Cloudflare Tunnel (`infosites-tunnel`) |
+| Domain | `novaanalyrics.com` (Cloudflare) |
+
+---
+
+## Running locally
 
 ```bash
-docker pull docker.umami.is/umami-software/umami:latest
+git clone https://github.com/ziur-vela/nova-analytics.git
+cd nova-analytics
+npm install --legacy-peer-deps
 ```
 
-Docker compose (Runs Umami with a PostgreSQL database):
+Create `.env.local`:
+```env
+DATABASE_URL=postgresql://nova:nova@localhost:5432/nova
+NOVA_ADMIN_TOKEN=<admin JWT from running instance>
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+```bash
+npm run build
+npm start
+```
+
+## Running with Docker
 
 ```bash
 docker compose up -d
 ```
 
----
-
-## 🔄 Getting Updates
-
-To get the latest features, simply do a pull, install any new dependencies, and rebuild:
+The app boots on port `8102` mapped to container port `3000`. On first boot, Prisma runs migrations automatically. Obtain the admin JWT via:
 
 ```bash
-git pull
-pnpm install
-pnpm build
+curl -X POST http://localhost:8102/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"umami"}'
 ```
 
-To update the Docker image, simply pull the new images and rebuild:
-
-```bash
-docker compose pull
-docker compose up --force-recreate -d
-```
+Set the returned token as `NOVA_ADMIN_TOKEN` in your `.env` and change the admin password immediately.
 
 ---
 
-## 🛟 Support
+## Test credentials
 
-<p align="center">
-  <a href="https://github.com/umami-software/umami"><img src="https://img.shields.io/badge/GitHub--blue?style=social&logo=github" alt="GitHub" /></a>
-  <a href="https://twitter.com/umami_software"><img src="https://img.shields.io/badge/Twitter--blue?style=social&logo=twitter" alt="Twitter" /></a>
-  <a href="https://linkedin.com/company/umami-software"><img src="https://img.shields.io/badge/LinkedIn--blue?style=social&logo=linkedin" alt="LinkedIn" /></a>
-  <a href="https://umami.is/discord"><img src="https://img.shields.io/badge/Discord--blue?style=social&logo=discord" alt="Discord" /></a>
-</p>
+```
+Email:    liveuser@nova.com
+Password: livepass123
+```
 
-[release-shield]: https://img.shields.io/github/release/umami-software/umami.svg
-[releases-url]: https://github.com/umami-software/umami/releases
-[license-shield]: https://img.shields.io/github/license/umami-software/umami.svg
-[license-url]: https://github.com/umami-software/umami/blob/master/LICENSE
-[build-shield]: https://img.shields.io/github/actions/workflow/status/umami-software/umami/ci.yml
-[build-url]: https://github.com/umami-software/umami/actions
-[github-shield]: https://img.shields.io/badge/GitHub--blue?style=social&logo=github
-[github-url]: https://github.com/umami-software/umami
-[twitter-shield]: https://img.shields.io/badge/Twitter--blue?style=social&logo=twitter
-[twitter-url]: https://twitter.com/umami_software
-[linkedin-shield]: https://img.shields.io/badge/LinkedIn--blue?style=social&logo=linkedin
-[linkedin-url]: https://linkedin.com/company/umami-software
-[discord-shield]: https://img.shields.io/badge/Discord--blue?style=social&logo=discord
-[discord-url]: https://discord.com/invite/4dz4zcXYrQ
+---
+
+## AI Toolchain
+
+| Tool | Role |
+|------|------|
+| Claude Sonnet 4.6 (claude.ai) | Planning, architecture, brand design, landing page HTML, auth system design, all phase prompts, all documentation |
+| OpenCode TUI + DeepSeek V4 Pro | All terminal operations: build, deploy, debug patches, Cloudflare config, tracking injection |
+| ChatGPT / DALL-E | Logo mark and wordmark PNG assets |
+
+Tool substitution (OpenCode instead of Claude Code) was pre-approved by DCM before build work began.
+
+---
+
+## Upstream
+
+Forked from [umami-software/umami](https://github.com/umami-software/umami) — MIT License.
