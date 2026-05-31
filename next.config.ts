@@ -19,14 +19,15 @@ const forceSSL = process.env.FORCE_SSL || '';
 const frameAncestors = process.env.ALLOWED_FRAME_URLS || '';
 const trackerScriptName = process.env.TRACKER_SCRIPT_NAME || '';
 const trackerScriptURL = process.env.TRACKER_SCRIPT_URL || '';
-const selfTrack = process.env.UMAMI_SELF_TRACK || '';
-const selfRecord = process.env.UMAMI_SELF_RECORD || '';
+const selfTrack = process.env.NOVA_SELF_TRACK || '';
+const selfRecord = process.env.NOVA_SELF_RECORD || '';
 
 const contentSecurityPolicy = `
   default-src 'self';
   img-src 'self' https: data:;
   script-src 'self' 'unsafe-eval' 'unsafe-inline';
-  style-src 'self' 'unsafe-inline';
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src 'self' https://fonts.gstatic.com;
   connect-src 'self' https:;
   frame-ancestors 'self' ${frameAncestors};
 `;
@@ -179,7 +180,7 @@ if (trackerScriptName) {
 if (isProd && cloudMode) {
   rewrites.push({
     source: '/script.js',
-    destination: 'https://cloud.umami.is/script.js',
+    destination: 'https://cloud.nova-analytics.is/script.js',
   });
 }
 

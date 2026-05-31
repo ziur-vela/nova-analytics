@@ -3,24 +3,39 @@ import type { SVGProps } from 'react';
 const SvgLogoWhite = (props: SVGProps<SVGSVGElement>) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width={20}
-    height={20}
-    viewBox="0 0 428 389.11"
+    width={48}
+    height={48}
+    viewBox="0 0 200 200"
     {...props}
   >
-    <circle
-      cx={214.15}
-      cy={181}
-      r={171}
-      fill="none"
-      stroke="#fff"
-      strokeMiterlimit={10}
-      strokeWidth={20}
-    />
-    <path
-      fill="#fff"
-      d="M413 134.11H15.29a15 15 0 0 0-15 15v15.3C.12 168 0 171.52 0 175.11c0 118.19 95.81 214 214 214 116.4 0 211.1-92.94 213.93-208.67 0-.44.07-.88.07-1.33v-30a15 15 0 0 0-15-15"
-    />
+    <defs>
+      <linearGradient id="ngw" x1="0.5" y1="0" x2="0.5" y2="1">
+        <stop offset="0%" stopColor="#F5A623" />
+        <stop offset="100%" stopColor="#E8820C" />
+      </linearGradient>
+    </defs>
+    <g transform="translate(100,100)">
+      <path d="M0,-70 C5,-22 22,-5 0,0 C-22,-5 -5,-22 0,-70Z" fill="url(#ngw)" />
+      <path d="M0,70 C-5,22 -22,5 0,0 C22,5 5,22 0,70Z" fill="url(#ngw)" />
+      <path d="M-70,0 C-22,5 -5,22 0,0 C-5,-22 -22,-5 -70,0Z" fill="url(#ngw)" />
+      <path d="M70,0 C22,-5 5,-22 0,0 C5,22 22,5 70,0Z" fill="url(#ngw)" />
+      <line x1="0" y1="-26" x2="0" y2="-42" stroke="#F5A623" strokeWidth="3.5" strokeLinecap="round" />
+      <circle cx="0" cy="-44" r="2.5" fill="#F5A623" />
+      <line x1="0" y1="26" x2="0" y2="42" stroke="#F5A623" strokeWidth="3.5" strokeLinecap="round" />
+      <circle cx="0" cy="44" r="2.5" fill="#F5A623" />
+      <line x1="-26" y1="0" x2="-42" y2="0" stroke="#F5A623" strokeWidth="3.5" strokeLinecap="round" />
+      <circle cx="-44" cy="0" r="2.5" fill="#F5A623" />
+      <line x1="26" y1="0" x2="42" y2="0" stroke="#F5A623" strokeWidth="3.5" strokeLinecap="round" />
+      <circle cx="44" cy="0" r="2.5" fill="#F5A623" />
+      <line x1="-18" y1="-18" x2="-38" y2="-38" stroke="#E8820C" strokeWidth="3" strokeLinecap="round" />
+      <circle cx="-43" cy="-43" r="6" fill="none" stroke="#E8820C" strokeWidth="3" />
+      <line x1="18" y1="-18" x2="38" y2="-38" stroke="#E8820C" strokeWidth="3" strokeLinecap="round" />
+      <circle cx="43" cy="-43" r="6" fill="none" stroke="#E8820C" strokeWidth="3" />
+      <line x1="-18" y1="18" x2="-38" y2="38" stroke="#E8820C" strokeWidth="3" strokeLinecap="round" />
+      <circle cx="-43" cy="43" r="6" fill="none" stroke="#E8820C" strokeWidth="3" />
+      <line x1="18" y1="18" x2="38" y2="38" stroke="#E8820C" strokeWidth="3" strokeLinecap="round" />
+      <circle cx="43" cy="43" r="6" fill="none" stroke="#E8820C" strokeWidth="3" />
+    </g>
   </svg>
 );
 export default SvgLogoWhite;
