@@ -96,13 +96,6 @@ Set the returned token as `NOVA_ADMIN_TOKEN` in your `.env` and change the admin
 
 ---
 
-## Test credentials
-
-```
-Email:    liveuser@nova.com
-Password: livepass123
-```
-
 ---
 
 ## AI Toolchain
