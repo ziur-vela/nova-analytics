@@ -94,7 +94,6 @@ curl -X POST http://localhost:8102/api/auth/login \
 
 Set the returned token as `NOVA_ADMIN_TOKEN` in your `.env` and change the admin password immediately.
 
----
 
 ---
 
