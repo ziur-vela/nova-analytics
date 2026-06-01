@@ -3,7 +3,7 @@ import { DataGrid } from '@/components/common/DataGrid';
 import { useUserWebsitesQuery } from '@/components/hooks';
 
 export function UserWebsites({ userId }) {
-  const queryResult = useUserWebsitesQuery({ userId });
+  const queryResult = useUserWebsitesQuery({ userId }, { includeTeams: true });
 
   return (
     <DataGrid query={queryResult}>

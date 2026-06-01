@@ -19,7 +19,7 @@ export function WebsitesDataTable({
   showActions?: boolean;
 }) {
   const { user } = useLoginQuery();
-  const queryResult = useUserWebsitesQuery({ userId: userId || user?.id, teamId });
+  const queryResult = useUserWebsitesQuery({ userId: userId || user?.id, teamId }, { includeTeams: true });
   const { renderUrl } = useNavigation();
 
   const renderLink = (row: any) => (

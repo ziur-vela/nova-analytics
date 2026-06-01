@@ -26,16 +26,14 @@ export async function canViewWebsite({ user, shareToken }: Auth, websiteId: stri
     return false;
   }
 
-  if (entity.userId && user.id === entity.userId) {
-    return true;
+  if (entity.userId) {
+    return user.id === entity.userId;
   }
 
   if (entity.teamId) {
     const teamUser = await getTeamUser(entity.teamId, user.id);
 
-    if (teamUser) {
-      return true;
-    }
+    return !!teamUser;
   }
 
   return false;
@@ -72,16 +70,14 @@ export async function canUpdateWebsite({ user }: Auth, websiteId: string) {
     return false;
   }
 
-  if (website.userId && user.id === website.userId) {
-    return true;
+  if (website.userId) {
+    return user.id === website.userId;
   }
 
   if (website.teamId) {
     const teamUser = await getTeamUser(website.teamId, user.id);
 
-    if (teamUser && hasPermission(teamUser.role, PERMISSIONS.websiteUpdate)) {
-      return true;
-    }
+    return teamUser && hasPermission(teamUser.role, PERMISSIONS.websiteUpdate);
   }
 
   return false;
@@ -102,16 +98,14 @@ export async function canDeleteWebsite({ user }: Auth, websiteId: string) {
     return false;
   }
 
-  if (website.userId && user.id === website.userId) {
-    return true;
+  if (website.userId) {
+    return user.id === website.userId;
   }
 
   if (website.teamId) {
     const teamUser = await getTeamUser(website.teamId, user.id);
 
-    if (teamUser && hasPermission(teamUser.role, PERMISSIONS.websiteDelete)) {
-      return true;
-    }
+    return teamUser && hasPermission(teamUser.role, PERMISSIONS.websiteDelete);
   }
 
   return false;

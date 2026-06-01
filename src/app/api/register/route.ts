@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { updateWebsite } from "@/queries/prisma/website";
+import { uuid } from "@/lib/crypto";
+import prisma from "@/lib/prisma";
+
+const TEAM_NAME = "Admin Websites";
 
 export async function POST(req: NextRequest) {
   try {
@@ -34,12 +37,36 @@ export async function POST(req: NextRequest) {
 
     const newUser = await response.json();
     const userId = newUser.id;
-    const websiteId = "3bcf5fec-19a0-4c93-b45f-d4d430c56943";
 
     try {
-      await updateWebsite(websiteId, { userId });
-    } catch {
-      console.warn("Website assignment failed for new user:", userId);
+      const team = await prisma.client.team.findFirst({
+        where: {
+          name: TEAM_NAME,
+          deletedAt: null,
+        },
+      });
+
+      if (team) {
+        const existingMembership = await prisma.client.teamUser.findFirst({
+          where: {
+            teamId: team.id,
+            userId,
+          },
+        });
+
+        if (!existingMembership) {
+          await prisma.client.teamUser.create({
+            data: {
+              id: uuid(),
+              teamId: team.id,
+              userId,
+              role: "team-owner",
+            },
+          });
+        }
+      }
+    } catch (err) {
+      console.warn("Team assignment failed for new user:", userId, err);
     }
 
     return NextResponse.json({ success: true }, { status: 200 });
